@@ -5,8 +5,9 @@ Built using Gradle with Kotlin DSL support.
 
 ## Features
 - Add/update/delete student records
-- SQLite/Firestore integration (if used)
+- Firestore integration
 - Clean fragment-based UI
+- dynamically put attedance for students using geofence 
 
 ## Tech Stack
 - Android Studio
