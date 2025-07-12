@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.student" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Set default background -->
+
+        <item name="android:windowBackground">@drawable/bg_blur</item>
+        <item name="android:colorBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+
+    </style>
+</resources>
