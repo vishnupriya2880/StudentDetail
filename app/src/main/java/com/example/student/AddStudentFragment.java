@@ -1,8 +1,7 @@
 package com.example.student;
 
-import static java.security.AccessController.getContext;
-
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,66 +16,72 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 public class AddStudentFragment extends Fragment {
 
     private TextInputLayout nameL, emailL, ageL;
-
     private TextInputEditText nameIn, emailIn, ageIn;
     private FirebaseFirestore db;
 
-    @Nullable @Override
+    @Nullable
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_add_student, container, false);
 
-        nameL  = v.findViewById(R.id.nameLayout);
+        nameL = v.findViewById(R.id.nameLayout);
         emailL = v.findViewById(R.id.emailLayout);
-        ageL   = v.findViewById(R.id.ageLayout);
+        ageL = v.findViewById(R.id.ageLayout);
 
-        nameIn  = v.findViewById(R.id.nameInput);
+        nameIn = v.findViewById(R.id.nameInput);
         emailIn = v.findViewById(R.id.emailInput);
-        ageIn   = v.findViewById(R.id.ageInput);
+        ageIn = v.findViewById(R.id.ageInput);
 
         db = FirebaseFirestore.getInstance();
 
         v.findViewById(R.id.saveBtn).setOnClickListener(view -> saveStudent());
+
         return v;
     }
 
     private void saveStudent() {
-        // clear previous errors
-        nameL.setError(null); emailL.setError(null); ageL.setError(null);
-
-        String name  = Objects.requireNonNull(nameIn.getText()).toString().trim();
+        String name = Objects.requireNonNull(nameIn.getText()).toString().trim();
         String email = Objects.requireNonNull(emailIn.getText()).toString().trim();
-        String ageStr= Objects.requireNonNull(ageIn.getText()).toString().trim();
+        String ageStr = Objects.requireNonNull(ageIn.getText()).toString().trim();
 
-        boolean valid = true;
+        if (name.isEmpty() || email.isEmpty() || ageStr.isEmpty()) {
+            Toast.makeText(getContext(), "Fill all fields!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        if (name.isEmpty())  { nameL.setError("Required"); valid = false; }
-        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            emailL.setError("Valid email required"); valid = false; }
-        int age = 0;
-        try { age = Integer.parseInt(ageStr); }
-        catch (NumberFormatException e) { ageL.setError("Age?"); valid = false; }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailL.setError("Invalid email");
+            return;
+        }
 
-        if (!valid) return;
+        int age = Integer.parseInt(ageStr);
 
-        Student s = new Student(UUID.randomUUID().toString(), name, email, age);
+        // Get this device's unique ID
+        String deviceId = Settings.Secure.getString(requireContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
-        db.collection("students").document(s.getId())
-                .set(s)
-                .addOnSuccessListener(unused -> {
-                    Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
-                    requireActivity().getSupportFragmentManager().popBackStack(); // return to list
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", name);
+        data.put("email", email);
+        data.put("age", age);
+        data.put("present", false);
+        data.put("deviceId", deviceId);
+
+        db.collection("students").add(data)
+                .addOnSuccessListener(ref -> {
+                    Toast.makeText(getContext(), "Student added!", Toast.LENGTH_SHORT).show();
+                    requireActivity().getSupportFragmentManager().popBackStack();
                 })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                });
-
+                .addOnFailureListener(e ->
+                        Toast.makeText(getContext(), "Failed: " + e.getMessage(), Toast.LENGTH_LONG).show()
+                );
     }
 }

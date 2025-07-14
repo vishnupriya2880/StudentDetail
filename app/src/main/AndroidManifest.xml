@@ -24,13 +24,9 @@
             android:value="@integer/google_play_services_version" />
 
         <!-- ✅ Geofence Receiver -->
-        <receiver
-            android:name=".GeofenceBroadcastReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.example.student.GEOFENCE_TRANSITION" />
-            </intent-filter>
-        </receiver>
+        <receiver android:name=".GeofenceBroadcastReceiver"
+            android:exported="true" />
+
 
         <!-- ✅ MainActivity -->
         <activity

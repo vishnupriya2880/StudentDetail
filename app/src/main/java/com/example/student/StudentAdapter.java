@@ -38,8 +38,18 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
                 badge.setVisibility(View.GONE);
             }
 
-            itemView.setOnClickListener(v -> listener.onStudentSelected(student));
+            // ✅ Save selected student ID and notify listener
+            itemView.setOnClickListener(v -> {
+                listener.onStudentSelected(student);
+
+                v.getContext()
+                        .getSharedPreferences("prefs", android.content.Context.MODE_PRIVATE)
+                        .edit()
+                        .putString("studentId", student.getId())
+                        .apply();
+            });
         }
+
 
     }
         @NonNull

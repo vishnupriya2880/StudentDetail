@@ -5,7 +5,8 @@ import java.io.Serializable;
 public class Student implements Serializable {
     private String id, name, email;
     private int age;
-    private boolean present;        // ✅ new
+    private boolean present;
+    private String deviceId ;// ✅ new
 
     public Student() {
     }               // Firestore needs empty ctor
@@ -58,5 +59,13 @@ public class Student implements Serializable {
 
     public void setPresent(boolean present) {
         this.present = present;
+    }
+    public String getDeviceId() {
+
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 }

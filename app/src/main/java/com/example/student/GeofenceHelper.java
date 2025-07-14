@@ -26,9 +26,9 @@ public class GeofenceHelper {
     private final Context context;
 
     // Set your school coordinates
-    private final double LATITUDE =11.8672772;  // Example: Google HQ
-    private final double LONGITUDE =79.7985143;
-    private final float RADIUS = 1; // meters
+    private final double LATITUDE =11.8672702;
+    private final double LONGITUDE =79.7985203;
+    private final float RADIUS = 200; // meters
 
     public GeofenceHelper(Context context) {
         this.context = context;
@@ -36,15 +36,13 @@ public class GeofenceHelper {
     }
 
     public void addSchoolGeofence() {
-
-        // ✅ Check permissions using ContextCompat
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.w(TAG, "❌ Location permission not granted");
             return;
         }
 
-        // ✅ Log current location (for debugging)
+        // Log current location (optional for debugging)
         FusedLocationProviderClient fused = LocationServices.getFusedLocationProviderClient(context);
         fused.getLastLocation().addOnSuccessListener(location -> {
             if (location != null) {
@@ -62,13 +60,13 @@ public class GeofenceHelper {
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .build();
 
-        // ✅ Create geofence request
+        // ✅ Create geofencing request with INITIAL_TRIGGER_ENTER
         GeofencingRequest geofencingRequest = new GeofencingRequest.Builder()
                 .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
                 .addGeofence(geofence)
                 .build();
 
-        // ✅ Add geofence
+        // ✅ Add geofence to geofencing client
         geofencingClient.addGeofences(geofencingRequest, getPendingIntent())
                 .addOnSuccessListener(unused -> Log.d(TAG, "✅ Geofence added successfully"))
                 .addOnFailureListener(e -> Log.e(TAG, "❌ Failed to add geofence: " + e.getMessage()));
@@ -85,7 +83,6 @@ public class GeofenceHelper {
 
     private Intent getIntent() {
         Intent intent = new Intent(context, GeofenceBroadcastReceiver.class);
-        intent.setAction("com.example.student.GEOFENCE_TRANSITION");
         return intent;
     }
 }

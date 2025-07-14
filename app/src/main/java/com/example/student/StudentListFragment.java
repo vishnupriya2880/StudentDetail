@@ -54,6 +54,7 @@ public class StudentListFragment extends Fragment {
             Log.d("StudentListFragment", "FAB clicked");
             Toast.makeText(getContext(), "Add clicked", Toast.LENGTH_SHORT).show();
 
+
             requireActivity().getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, new AddStudentFragment())
